@@ -1,6 +1,7 @@
 package com.mangomusic.service;
 
 import com.mangomusic.dao.ArtistDao;
+import com.mangomusic.model.Album;
 import com.mangomusic.model.Artist;
 import org.springframework.stereotype.Service;
 
@@ -57,4 +58,6 @@ public class ArtistService {
             throw new IllegalArgumentException("Primary genre is required");
         }
     }
+
+
 }

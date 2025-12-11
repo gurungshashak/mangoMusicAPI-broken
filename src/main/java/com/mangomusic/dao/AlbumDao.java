@@ -241,4 +241,49 @@ public class AlbumDao {
         return 0;
     }
 
+
+    public Album findTopAlbumByArtistId(int artistId) {
+
+        String query =
+                "SELECT al.album_id, al.artist_id, al.title, al.release_year, ar.name AS artist_name, " +
+                        "       COUNT(ap.play_id) AS play_count " +
+                        "FROM albums al " +
+                        "JOIN artists ar ON al.artist_id = ar.artist_id " +
+                        "JOIN album_plays ap ON al.album_id = ap.album_id " +
+                        "WHERE al.artist_id = ? " +
+                        "GROUP BY al.album_id, al.artist_id, al.title, al.release_year, ar.name " +
+                        "ORDER BY play_count DESC, al.album_id ASC " +
+                        "LIMIT 1";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, artistId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    Album album = new Album();
+                    album.setAlbumId(rs.getInt("album_id"));
+                    album.setArtistId(rs.getInt("artist_id"));
+                    album.setTitle(rs.getString("title"));
+                    album.setReleaseYear(rs.getInt("release_year"));
+                    album.setArtistName(rs.getString("artist_name"));
+                    rs.getInt("play_count");
+
+                    return album;
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding top album by artist", e);
+        }
+
+        return null;
+    }
+
+
+
+
+
 }

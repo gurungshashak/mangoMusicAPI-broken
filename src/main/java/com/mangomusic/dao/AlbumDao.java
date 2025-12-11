@@ -218,4 +218,27 @@ public class AlbumDao {
         album.setArtistName(results.getString("artist_name"));
         return album;
     }
+
+
+    public int countPlaysForAlbum(int albumId) {
+        String query = "SELECT COUNT(*) AS play_count FROM album_plays WHERE album_id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, albumId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("play_count");
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error counting plays for album", e);
+        }
+
+        return 0;
+    }
+
 }

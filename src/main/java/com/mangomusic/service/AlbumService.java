@@ -1,12 +1,16 @@
 package com.mangomusic.service;
 
 import com.mangomusic.dao.AlbumDao;
+import com.mangomusic.dao.AlbumPlayDao;
 import com.mangomusic.dao.ArtistDao;
 import com.mangomusic.model.Album;
 import com.mangomusic.model.Artist;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AlbumService {
@@ -91,4 +95,27 @@ public class AlbumService {
             }
         }
     }
+
+
+    public List<Object> getAlbumPlayCount(int albumId) {
+        Artist artist = artistDao.getArtistById(albumId);
+        Album album = albumDao.getAlbumById(albumId);
+        if (album == null) {
+            return null;
+        }
+
+        int playCount = albumDao.countPlaysForAlbum(albumId);
+
+        List<Object> response = new ArrayList<>();
+        response.add("AlbumID: " + album.getAlbumId());
+        response.add("Album Title: " + album.getTitle());
+        response.add("Artist Name: " + artist.getName());
+        response.add("playCount: " + playCount);
+
+        return response;
+    }
+
+
+
+
 }

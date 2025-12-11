@@ -19,6 +19,8 @@ public class Album {
         this.artistName = artistName;
     }
 
+    public Album(Integer albumId, String title, String artistName) {}
+
     public Integer getAlbumId() {
         return albumId;
     }

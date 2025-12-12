@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -226,4 +227,32 @@ public class UserDao {
         user.setCountry(results.getString("country"));
         return user;
     }
+
+    public List<LocalDate> getUserPlayDates(int userId) {
+        List<LocalDate> dates = new ArrayList<>();
+
+        String query =
+                "SELECT DATE(played_at) AS play_date " +
+                        "FROM album_plays " +
+                        "WHERE user_id = ? AND completed = true " +
+                        "ORDER BY play_date DESC";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    dates.add(rs.getDate("play_date").toLocalDate());
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching user's play dates", e);
+        }
+
+        return dates;
+    }
+
 }

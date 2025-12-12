@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -79,4 +80,18 @@ public class UserController {
         }
         return ResponseEntity.noContent().build();
     }
+
+
+    @GetMapping("/{userId}/listening-streak")
+    public ResponseEntity<?> getListeningStreak(@PathVariable int userId) {
+
+        Map<String, Object> result = userService.getListeningStreak(userId);
+
+        if (result == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
 }

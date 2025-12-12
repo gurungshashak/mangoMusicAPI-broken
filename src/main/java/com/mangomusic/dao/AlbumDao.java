@@ -303,7 +303,6 @@ public class AlbumDao {
         return albums;
     }
 
-
     public List<List<Object>> getTrendingAlbums(int days) {
 
         if (days < 1) days = 1;

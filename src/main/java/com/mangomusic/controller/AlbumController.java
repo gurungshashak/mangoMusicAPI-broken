@@ -91,4 +91,21 @@ public class AlbumController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/recent")
+    public ResponseEntity<List<Album>> getRecentAlbums(
+            @RequestParam(defaultValue = "10") int limit) {
+
+        List<Album> albums = albumService.getRecentAlbums(limit);
+        return ResponseEntity.ok(albums);
+    }
+
+
+    @GetMapping("/trending")
+    public ResponseEntity<List<List<Object>>> getTrendingAlbums(
+            @RequestParam(defaultValue = "7") int days) {
+
+        return ResponseEntity.ok(albumService.getTrendingAlbums(days));
+    }
+
+
 }

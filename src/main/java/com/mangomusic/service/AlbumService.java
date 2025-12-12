@@ -150,6 +150,21 @@ public class AlbumService {
   "playCount": 1245
  */
 
+    public List<Album> getRecentAlbums(int limit) {
+        if (limit > 100) {
+            limit = 100;
+        }
+        if (limit < 1) {
+            limit = 10;
+        }
+        return albumDao.getRecentAlbums(limit);
+    }
+
+    public List<List<Object>> getTrendingAlbums(int days) {
+        return albumDao.getTrendingAlbums(days);
+    }
+
+
 
 
 }

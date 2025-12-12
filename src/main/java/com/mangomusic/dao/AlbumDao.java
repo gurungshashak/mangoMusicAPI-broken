@@ -1,6 +1,7 @@
 package com.mangomusic.dao;
 
 import com.mangomusic.model.Album;
+import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -270,6 +271,92 @@ public class AlbumDao {
 
         return 0;
     }
+
+
+    public List<Album> getRecentAlbums(int limit) {
+        List<Album> albums = new ArrayList<>();
+
+        String query =
+                "SELECT al.album_id, al.artist_id, al.title, al.release_year, ar.name AS artist_name " +
+                        "FROM albums al " +
+                        "JOIN artists ar ON al.artist_id = ar.artist_id " +
+                        "WHERE al.release_year >= YEAR(CURDATE()) - 2 " +
+                        "ORDER BY al.release_year DESC, al.title ASC " +
+                        "LIMIT ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, limit);
+
+            try (ResultSet results = statement.executeQuery()) {
+                while (results.next()) {
+                    Album album = mapRowToAlbum(results);
+                    albums.add(album);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting recent albums", e);
+        }
+
+        return albums;
+    }
+
+
+    public List<List<Object>> getTrendingAlbums(int days) {
+
+        if (days < 1) days = 1;
+        if (days > 30) days = 30;
+
+        String query =
+                "SELECT al.album_id, al.artist_id, al.title, al.release_year, ar.name AS artist_name, " +
+                        "       COUNT(ap.play_id) AS recent_play_count " +
+                        "FROM albums al " +
+                        "JOIN artists ar ON al.artist_id = ar.artist_id " +
+                        "JOIN album_plays ap ON al.album_id = ap.album_id " +
+                        "WHERE ap.played_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY) " +
+                        "GROUP BY al.album_id, al.artist_id, al.title, al.release_year, ar.name " +
+                        "ORDER BY recent_play_count DESC, al.album_id ASC " +
+                        "LIMIT 10";
+
+        List<List<Object>> trendingAlbums = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setInt(1, days);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                int rank = 1;
+                while (rs.next()) {
+
+                    // One row = one ArrayList of values
+                    List<Object> row = new ArrayList<>();
+
+                    row.add(rs.getInt( "album_id"));
+                    row.add(rs.getInt( "artist_id"));
+                    row.add(rs.getString( "title"));
+                    row.add(rs.getInt(   "release_year"));
+                    row.add(rs.getString( "artist_name"));
+                    row.add(rs.getInt(  "recent_play_count"));
+                    row.add(rank++);
+
+                    trendingAlbums.add(row);
+
+
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching trending albums", e);
+        }
+
+        return trendingAlbums;
+    }
+
+
+
 
 
 

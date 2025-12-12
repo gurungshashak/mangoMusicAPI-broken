@@ -115,6 +115,40 @@ public class AlbumService {
         return response;
     }
 
+    public List<Object> getTopAlbumForArtist(int artistId) {
+
+        Artist artist = artistDao.getArtistById(artistId);
+        if (artist == null) {
+            return new ArrayList<>(); // no null
+        }
+
+        Album album = albumDao.getAlbumById(artistId);
+        if (album == null) {
+            return new ArrayList<>();
+        }
+
+        int playCount = albumDao.findTopAlbumByArtistId(artistId);
+
+        List<Object> response = new ArrayList<>();
+        response.add("AlbumID: " + album.getAlbumId());
+        response.add("ArtistID: " + artist.getArtistId());
+        response.add("Title: " + album.getTitle());
+        response.add("ReleaseYear: " + album.getReleaseYear());
+        response.add("ArtistName: " + artist.getName());
+        response.add("PlayCount: " + playCount);
+
+        return response;
+    }
+
+
+/*
+ "albumId": 42,
+  "artistId": 1,
+  "title": "Abbey Road",
+  "releaseYear": 1969,
+  "artistName": "The Beatles",
+  "playCount": 1245
+ */
 
 
 

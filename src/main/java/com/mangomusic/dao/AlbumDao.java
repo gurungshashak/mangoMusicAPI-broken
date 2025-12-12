@@ -242,7 +242,7 @@ public class AlbumDao {
     }
 
 
-    public Album findTopAlbumByArtistId(int artistId) {
+    public int findTopAlbumByArtistId(int artistId) {
 
         String query =
                 "SELECT al.album_id, al.artist_id, al.title, al.release_year, ar.name AS artist_name, " +
@@ -259,27 +259,16 @@ public class AlbumDao {
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, artistId);
-
             try (ResultSet rs = ps.executeQuery()) {
-
                 if (rs.next()) {
-                    Album album = new Album();
-                    album.setAlbumId(rs.getInt("album_id"));
-                    album.setArtistId(rs.getInt("artist_id"));
-                    album.setTitle(rs.getString("title"));
-                    album.setReleaseYear(rs.getInt("release_year"));
-                    album.setArtistName(rs.getString("artist_name"));
-                    rs.getInt("play_count");
-
-                    return album;
+                    return rs.getInt("play_count");
                 }
             }
-
         } catch (SQLException e) {
             throw new RuntimeException("Error finding top album by artist", e);
         }
 
-        return null;
+        return 0;
     }
 
 

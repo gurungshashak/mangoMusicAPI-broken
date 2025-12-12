@@ -1,7 +1,9 @@
 package com.mangomusic.controller;
 
 import com.mangomusic.model.Artist;
+import com.mangomusic.service.AlbumService;
 import com.mangomusic.service.ArtistService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,4 +73,24 @@ public class ArtistController {
         }
         return ResponseEntity.noContent().build();
     }
+
+    @Autowired
+    private AlbumService albumService;
+    @Autowired
+    public AlbumService getAlbumService() {
+        return albumService;
+    }
+
+    @GetMapping("/{id}/top-album")
+    public ResponseEntity<List<Object>> getTopAlbum(@PathVariable int id) {
+        List<Object> result = albumService.getTopAlbumForArtist(id);
+
+        if (result == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
+
 }
